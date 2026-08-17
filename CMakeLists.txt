@@ -1,0 +1,67 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(memtest86
+    VERSION 1.0.0
+    DESCRIPTION "Memory diagnostic tool for deepin 25, inspired by memtest86"
+    LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets LinguistTools)
+find_package(Dtk6 REQUIRED COMPONENTS Widget)
+
+set(TS_FILES
+    translations/memtest86_zh_CN.ts
+    translations/memtest86_en_US.ts
+)
+
+qt6_add_translations(memtest86
+    TS_FILES ${TS_FILES}
+    QM_FILES_OUTPUT_VARIABLE QM_FILES
+    OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations
+)
+
+add_executable(memtest86
+    src/main.cpp
+    src/core/memtester.cpp
+    src/core/memtester.h
+    src/cli/cli.cpp
+    src/cli/cli.h
+    src/gui/mainwindow.cpp
+    src/gui/mainwindow.h
+    ${QM_FILES}
+)
+
+target_link_libraries(memtest86 PRIVATE
+    Qt6::Core
+    Qt6::Gui
+    Qt6::Widgets
+    Dtk6::Widget
+)
+
+target_include_directories(memtest86 PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Install: binary + translations
+install(TARGETS memtest86 RUNTIME DESTINATION bin)
+
+install(FILES ${QM_FILES}
+    DESTINATION share/memtest86/translations)
+
+# Desktop entry & icon (simple)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/misc/memtest86.desktop.in
+    ${CMAKE_CURRENT_BINARY_DIR}/memtest86.desktop
+    @ONLY
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/memtest86.desktop
+    DESTINATION share/applications)
