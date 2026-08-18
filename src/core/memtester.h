@@ -80,6 +80,10 @@ public:
     void setPassCount(int passes) { m_passes = passes; }
     void setTests(const QVector<int> &tests) { m_selectedTests = tests; }
     void setVerbose(bool v) { m_verbose = v; }
+    // Delay (ms) between write and verify in the bit fade test. Real
+    // memtest86 idles for minutes to let DRAM charge decay; default 1000 ms.
+    void setBitFadeDelayMs(int ms) { m_bitFadeDelayMs = qMax(0, ms); }
+    int bitFadeDelayMs() const { return m_bitFadeDelayMs; }
 
     // Buffer management: allocate/free test buffer
     bool allocateBuffer(quint64 sizeBytes);
@@ -101,6 +105,12 @@ public:
     // System helpers
     static quint64 totalPhysicalMemory();
     static quint64 availablePhysicalMemory();
+
+    // Self-test: verify the detection logic itself works by injecting a
+    // known corruption into a scratch buffer and checking that the test
+    // algorithms catch it. Returns true when the injected fault was found.
+    // Uses and replaces the current test buffer; call before a real run.
+    bool selfTest(QString *detail = nullptr);
 
     // Format bytes as human readable string (e.g. "512 MiB")
     static QString humanSize(quint64 bytes);
@@ -136,6 +146,7 @@ private:
                      const QString &desc);
 
     bool checkWord(volatile uint64_t *p, uint64_t expected, int test, const QString &desc);
+    bool checkDWord(volatile uint32_t *p, uint32_t expected, int test, const QString &desc);
 
     void log(const QString &msg);
 
@@ -146,6 +157,7 @@ private:
     quint64 m_regionSize = 0;
 
     int m_passes = 1;
+    int m_bitFadeDelayMs = 1000;
     QVector<int> m_selectedTests;
     bool m_verbose = false;
 

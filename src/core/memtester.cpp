@@ -14,6 +14,8 @@
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
+#include <sys/mman.h>
+#include <algorithm>   // std::min/std::max
 
 namespace memtest {
 
@@ -51,12 +53,23 @@ bool MemTesterCore::allocateBuffer(quint64 sizeBytes)
     m_buffer = p;
     m_bufferSize = sizeBytes;
     m_regionSize = sizeBytes;
+
+    // Best-effort hardening: none of these are fatal if they fail.
+    // 1) Prefer huge pages to cut TLB misses during the sweep.
+#ifdef MADV_HUGEPAGE
+    madvise(m_buffer, static_cast<size_t>(m_bufferSize), MADV_HUGEPAGE);
+#endif
+    // 2) Try to lock the buffer so it cannot be swapped out mid-test; this
+    //    usually requires CAP_IPC_LOCK or a raised RLIMIT_MEMLOCK, so it may
+    //    legitimately fail for unprivileged users — keep going either way.
+    mlock(m_buffer, static_cast<size_t>(m_bufferSize));
     return true;
 }
 
 void MemTesterCore::freeBuffer()
 {
     if (m_buffer) {
+        munlock(m_buffer, static_cast<size_t>(m_bufferSize));
         std::free(m_buffer);
         m_buffer = nullptr;
         m_bufferSize = 0;
@@ -108,10 +121,79 @@ bool MemTesterCore::checkWord(volatile uint64_t *p, uint64_t expected, int test,
     return true;
 }
 
+bool MemTesterCore::checkDWord(volatile uint32_t *p, uint32_t expected, int test,
+                               const QString &desc)
+{
+    uint32_t actual = *p;
+    if (actual != expected) {
+        uint64_t addr = reinterpret_cast<uintptr_t>(const_cast<uint32_t *>(p))
+                        - reinterpret_cast<uintptr_t>(m_buffer);
+        recordError(addr, expected, actual, test, desc);
+        return false;
+    }
+    return true;
+}
+
 void MemTesterCore::log(const QString &msg)
 {
     if (m_verbose)
         emit logMessage(msg);
+}
+
+// ---------------------------------------------------------------------------
+// Self test (fault injection)
+// ---------------------------------------------------------------------------
+bool MemTesterCore::selfTest(QString *detail)
+{
+    clearErrors();
+
+    // Use a small scratch buffer so the check stays fast.
+    const quint64 size = 16 * 1024;
+    if (!allocateBuffer(size)) {
+        if (detail)
+            *detail = QCoreApplication::translate("memtest", "failed to allocate scratch buffer");
+        return false;
+    }
+    volatile uint64_t *mem = reinterpret_cast<volatile uint64_t *>(m_buffer);
+    const quint64 words = size / kWordSize;
+
+    // 1) Baseline: write a known word and verify it reads back correctly.
+    const uint64_t known = 0x0123456789ABCDEFULL;
+    mem[0] = known;
+    if (!checkWord(&mem[0], known, 0, QStringLiteral("self-test baseline"))) {
+        if (detail)
+            *detail = QCoreApplication::translate("memtest", "baseline read-back check failed");
+        return false;
+    }
+
+    // 2) Inject a single-bit corruption; the detector must report exactly one error.
+    const uint64_t corrupted = known ^ (1ULL << 17);
+    mem[0] = corrupted;
+    const bool caught = !checkWord(&mem[0], known, 0, QStringLiteral("self-test inject"));
+    const bool counted = (errorCount() == 1);
+    if (!caught || !counted) {
+        if (detail)
+            *detail = QCoreApplication::translate("memtest",
+                "fault injection was not detected (caught=%1, errors=%2)")
+                    .arg(caught)
+                    .arg(errorCount());
+        return false;
+    }
+    clearErrors();
+
+    // 3) Run a real algorithm on the scratch buffer: no false positives.
+    for (quint64 i = 0; i < words; ++i)
+        mem[i] = 0;
+    const bool clean = testMovingInversions01(size);
+    if (!clean || errorCount() != 0) {
+        if (detail)
+            *detail = QCoreApplication::translate("memtest",
+                "test algorithm reported %1 errors on a clean buffer")
+                    .arg(errorCount());
+        return false;
+    }
+    clearErrors();
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -469,34 +551,35 @@ bool MemTesterCore::testMovingInversions8bit(quint64 bytes)
 }
 
 // Test 4: Moving inversions, random pattern.
+// Deterministic PRNG (fixed seed) so the sequence can be replayed without
+// storing an expected[] vector — halves peak memory usage vs recording it.
+// Invert pass reads back and complements each word from the tail, so any
+// fill-phase corruption is detected by the final verify (memtest86 style).
 bool MemTesterCore::testMovingInversionsRandom(quint64 bytes)
 {
     volatile uint64_t *mem = reinterpret_cast<volatile uint64_t *>(m_buffer);
     const quint64 words = bytes / kWordSize;
-    std::mt19937_64 rng(0x9E3779B97F4A7C15ULL);
-    std::vector<uint64_t> expected(words);
+    const uint64_t kSeed = 0x9E3779B97F4A7C15ULL;
 
     for (int rep = 0; rep < 2 && !m_stopRequested.load(); ++rep) {
-        // Fill forward with a deterministic random sequence (recorded in expected)
-        for (quint64 i = 0; i < words; ++i) {
-            expected[i] = rng();
-            mem[i] = expected[i];
-            if ((i & 0x7FFFF) == 0) {
-                m_currentPassBytes = i * kWordSize;
-                reportProgress({m_currentTest, m_currentPass, m_passes,
-                                m_currentPassBytes, m_currentPassTotal, errorCount(),
-                                computePercent(m_currentPass, rep * 2, 4)});
+        // Fill forward with a deterministic random sequence.
+        {
+            std::mt19937_64 rng(kSeed);
+            for (quint64 i = 0; i < words; ++i) {
+                mem[i] = rng();
+                if ((i & 0x7FFFF) == 0) {
+                    m_currentPassBytes = i * kWordSize;
+                    reportProgress({m_currentTest, m_currentPass, m_passes,
+                                    m_currentPassBytes, m_currentPassTotal, errorCount(),
+                                    computePercent(m_currentPass, rep * 2, 4)});
+                }
             }
         }
-        // Verify in reverse against the recorded sequence
+        // Invert pass: read-modify-write complements from the tail so each
+        // word transitions while its successor already holds the inverse
+        // (moving inversions coupling stress).
         for (quint64 i = words; i-- > 0;) {
-            if (!checkWord(&mem[i], expected[i], TestMovingInvRandom,
-                           QStringLiteral("random invert")))
-                break;
-        }
-        // Invert pass: write complement, verify
-        for (quint64 i = 0; i < words; ++i) {
-            mem[i] = ~expected[i];
+            mem[i] = ~mem[i];
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = (words + i) * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -504,10 +587,14 @@ bool MemTesterCore::testMovingInversionsRandom(quint64 bytes)
                                 computePercent(m_currentPass, rep * 2 + 1, 4)});
             }
         }
-        for (quint64 i = 0; i < words; ++i) {
-            if (!checkWord(&mem[i], ~expected[i], TestMovingInvRandom,
-                           QStringLiteral("random zero")))
-                break;
+        // Verify complements, replaying the sequence from the seed.
+        {
+            std::mt19937_64 rng(kSeed);
+            for (quint64 i = 0; i < words; ++i) {
+                if (!checkWord(&mem[i], ~rng(), TestMovingInvRandom,
+                               QStringLiteral("random zero")))
+                    break;
+            }
         }
     }
     return true;
@@ -576,11 +663,9 @@ bool MemTesterCore::testMovingInversions32block(quint64 bytes)
         for (quint64 i = dwords; i-- > 0;)
             mem[i] = inv;
         for (quint64 i = 0; i < dwords; ++i) {
-            uint32_t actual = mem[i];
-            if (actual != inv) {
-                recordError(i * sizeof(uint32_t), inv, actual, TestMovingInv32block,
-                            QStringLiteral("inv 32block"));
-            }
+            if (!checkDWord(&mem[i], inv, TestMovingInv32block,
+                            QStringLiteral("inv 32block")))
+                break;
             if ((i & 0xFFFFF) == 0) {
                 m_currentPassBytes = (dwords + i) * sizeof(uint32_t);
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -592,46 +677,55 @@ bool MemTesterCore::testMovingInversions32block(quint64 bytes)
     return true;
 }
 
-// Test 7: Random number sequence. Fill with a deterministic LFSR sequence,
-// verify exactly (write pass then verify pass).
+// Test 7: Random number sequence. Fill with a deterministic xorshift64
+// sequence, then verify by replaying the sequence from the seed (no
+// expected[] vector needed).
 bool MemTesterCore::testRandomSequence(quint64 bytes)
 {
     volatile uint64_t *mem = reinterpret_cast<volatile uint64_t *>(m_buffer);
     const quint64 words = bytes / kWordSize;
-    uint64_t state = 0x0123456789ABCDEFULL;
+    const uint64_t kSeed = 0x0123456789ABCDEFULL;
 
-    // Generate the same sequence into a side buffer to verify against.
-    std::vector<uint64_t> expected(words);
-    for (quint64 i = 0; i < words; ++i) {
-        // xorshift64
-        state ^= state << 13;
-        state ^= state >> 7;
-        state ^= state << 17;
-        expected[i] = state;
-        mem[i] = state;
-        if ((i & 0x3FFFF) == 0) {
-            m_currentPassBytes = i * kWordSize;
-            reportProgress({m_currentTest, m_currentPass, m_passes,
-                            m_currentPassBytes, m_currentPassTotal, errorCount(),
-                            computePercent(m_currentPass, 0, 2)});
+    // Write pass: generate the sequence once into memory.
+    {
+        uint64_t state = kSeed;
+        for (quint64 i = 0; i < words; ++i) {
+            // xorshift64
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            mem[i] = state;
+            if ((i & 0x3FFFF) == 0) {
+                m_currentPassBytes = i * kWordSize;
+                reportProgress({m_currentTest, m_currentPass, m_passes,
+                                m_currentPassBytes, m_currentPassTotal, errorCount(),
+                                computePercent(m_currentPass, 0, 2)});
+            }
         }
     }
-    for (quint64 i = 0; i < words; ++i) {
-        if (!checkWord(&mem[i], expected[i], TestRandomSequence,
-                       QStringLiteral("random sequence")))
-            break;
-        if ((i & 0x3FFFF) == 0) {
-            m_currentPassBytes = (words + i) * kWordSize;
-            reportProgress({m_currentTest, m_currentPass, m_passes,
-                            m_currentPassBytes, m_currentPassTotal * 2, errorCount(),
-                            computePercent(m_currentPass, 1, 2)});
+    // Verify pass: replay the same sequence from the seed.
+    {
+        uint64_t state = kSeed;
+        for (quint64 i = 0; i < words; ++i) {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            if (!checkWord(&mem[i], state, TestRandomSequence,
+                           QStringLiteral("random sequence")))
+                break;
+            if ((i & 0x3FFFF) == 0) {
+                m_currentPassBytes = (words + i) * kWordSize;
+                reportProgress({m_currentTest, m_currentPass, m_passes,
+                                m_currentPassBytes, m_currentPassTotal * 2, errorCount(),
+                                computePercent(m_currentPass, 1, 2)});
+            }
         }
     }
     return true;
 }
 
-// Test 9: Bit fade test, 2 patterns. Fill, delay, verify (no real delay in
-// user-space for speed; still validates retention of 0/1 patterns).
+// Test 9: Bit fade test, 2 patterns. Fill, wait for the configured delay so
+// DRAM charge can decay, then verify retention of 0/1 patterns.
 bool MemTesterCore::testBitFade(quint64 bytes)
 {
     volatile uint64_t *mem = reinterpret_cast<volatile uint64_t *>(m_buffer);
@@ -642,8 +736,16 @@ bool MemTesterCore::testBitFade(quint64 bytes)
         const uint64_t pat = pats[p];
         for (quint64 i = 0; i < words; ++i)
             mem[i] = pat;
-        // brief pause to simulate retention check
-        for (volatile int spin = 0; spin < 100000; ++spin) {}
+        // Real delay to let charge leak out of weak DRAM cells (respects
+        // stop requests so the test remains responsive).
+        {
+            const int stepMs = 50;
+            int remaining = m_bitFadeDelayMs;
+            while (remaining > 0 && !m_stopRequested.load()) {
+                QThread::msleep(qMin(stepMs, remaining));
+                remaining -= stepMs;
+            }
+        }
         for (quint64 i = 0; i < words; ++i) {
             if (!checkWord(&mem[i], pat, TestBitFade, QStringLiteral("bit fade")))
                 break;

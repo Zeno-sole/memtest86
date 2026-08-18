@@ -1,4 +1,4 @@
-.TH MEMTEST86 1 "August 2025" "memtest86 1.0.0" "User Commands"
+.TH MEMTEST86 1 "August 2025" "memtest86 1.1.0" "User Commands"
 .SH NAME
 memtest86 \- memory diagnostic tool for deepin 25
 .SH SYNOPSIS
@@ -24,6 +24,13 @@ Number of test passes (default: 1).
 .TP
 .B \-t, \-\-tests \fIlist\fR
 Comma separated test ids, e.g. 0,2,4 (default: all).
+.TP
+.B \-\-fade\-delay \fIms\fR
+Bit fade idle time between write and verify (default: 1000 ms; real
+memtest86 idles for minutes).
+.TP
+.B \-\-self\-test
+Inject a known single-bit fault and verify the detection logic reports it.
 .TP
 .B \-v, \-\-verbose
 Verbose output.

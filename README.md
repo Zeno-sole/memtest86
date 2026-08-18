@@ -22,6 +22,10 @@ Supports both CLI and DTK GUI modes; UI language follows the system locale
 - CLI 模式：指定内存大小、轮数、测试项，输出结果
 - GUI 模式：DTK6 风格界面，实时进度、错误记录表格
 - 中英文自动跟随系统语言（Qt Linguist i18n）
+- 自检模式（--self-test）：注入已知故障验证检测逻辑本身
+- 位衰减测试支持真实静置延时（--fade-delay），可配置
+- 测试缓冲区尝试锁页（mlock）与大页（MADV_HUGEPAGE），防止交换/减少 TLB 抖动
+- 随机模式测试使用种子重放，无需等大期望值向量，峰值内存减半
 
 ## 构建 / Build
 
@@ -52,6 +56,12 @@ cmake --build build -j$(nproc)
 # 只跑测试 0 和 2
 ./build/memtest86 --cli -t 0,2 -s 256M
 
+# 位衰减测试静置 10 秒（检测电荷泄漏）
+./build/memtest86 --cli -t 9 --fade-delay 10000
+
+# 自检：注入已知故障并验证检测逻辑
+./build/memtest86 --cli --self-test
+
 # 详细输出
 ./build/memtest86 --cli -v
 ```
@@ -64,6 +74,8 @@ cmake --build build -j$(nproc)
 | `-s, --size <size>` | 测试内存大小，如 256M / 1G / 512K（默认可用内存一半） |
 | `-p, --passes <n>` | 测试轮数（默认 1） |
 | `-t, --tests <list>` | 逗号分隔测试编号（默认全部） |
+| `--fade-delay <ms>` | 位衰减测试写入与校验之间的静置时间（默认 1000 ms） |
+| `--self-test` | 自检：注入已知故障并验证检测逻辑工作正常 |
 | `-v, --verbose` | 详细输出 |
 | `-h, --help` | 帮助 |
 

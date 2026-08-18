@@ -63,6 +63,13 @@ bool parseCliOptions(const QStringList &args, CliOptions *opts)
         } else if (a == "-t" || a == "--tests") {
             if (i + 1 >= args.size()) { opts->err = QStringLiteral("missing value for %1").arg(a); return false; }
             opts->testSpec = args.at(++i);
+        } else if (a == "--fade-delay") {
+            if (i + 1 >= args.size()) { opts->err = QStringLiteral("missing value for %1").arg(a); return false; }
+            bool ok = false;
+            opts->fadeDelayMs = args.at(++i).toInt(&ok);
+            if (!ok || opts->fadeDelayMs < 0) { opts->err = QStringLiteral("invalid fade delay: %1").arg(args.at(i)); return false; }
+        } else if (a == "--self-test") {
+            opts->selfTest = true;
         } else if (a == "-v" || a == "--verbose") {
             opts->verbose = true;
         } else if (a == "--cli") {
@@ -88,6 +95,9 @@ void printHelp()
         "                        (default: half of available memory)\n"
         "  -p, --passes <n>      Number of test passes (default: 1)\n"
         "  -t, --tests <list>    Comma separated test ids, e.g. 0,2,4 (default: all)\n"
+        "      --fade-delay <ms> Bit fade idle time between write and verify\n"
+        "                        (default: 1000 ms; real memtest86 idles minutes)\n"
+        "      --self-test       Inject a known fault and verify detection works\n"
         "  -v, --verbose         Verbose output\n"
         "  -h, --help            Show this help\n"
         "\n"
@@ -108,6 +118,21 @@ int runCli(const CliOptions &opts)
     QCoreApplication *app = QCoreApplication::instance();
 
     MemTesterCore tester;
+
+    // Self-test mode: verify detection logic, then exit.
+    if (opts.selfTest) {
+        out() << QObject::tr("Self-test: injecting a known fault into a 16 KiB scratch buffer...\n");
+        out().flush();
+        QString detail;
+        const bool ok = tester.selfTest(&detail);
+        if (ok) {
+            out() << QObject::tr("Self-test PASSED: fault injection was detected and a clean buffer\n"
+                                 "reported no errors (detection logic works).\n");
+            return 0;
+        }
+        out() << QObject::tr("Self-test FAILED: %1\n").arg(detail);
+        return 1;
+    }
 
     // Determine test region
     quint64 size = opts.sizeBytes;
@@ -148,6 +173,8 @@ int runCli(const CliOptions &opts)
     tester.setTests(tests);
     tester.setPassCount(opts.passes);
     tester.setVerbose(opts.verbose);
+    if (opts.fadeDelayMs >= 0)
+        tester.setBitFadeDelayMs(opts.fadeDelayMs);
 
     // Progress printing
     QObject::connect(&tester, &MemTesterCore::testStarted, [](int testId, int pass, int total) {

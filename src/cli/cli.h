@@ -16,6 +16,8 @@ struct CliOptions {
     quint64 sizeBytes = 0;          // 0 => auto (half of available memory)
     int passes = 1;
     QString testSpec;               // comma separated test ids, empty => all
+    int fadeDelayMs = -1;           // -1 => core default (1000 ms)
+    bool selfTest = false;
     bool verbose = false;
     bool help = false;
     QString err;

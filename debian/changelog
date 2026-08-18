@@ -1,3 +1,24 @@
+memtest86 (1.1.0-1) unstable; urgency=medium
+
+  * Iteration: core algorithm and robustness improvements
+    - Test 4/7 (random patterns) now replay the PRNG sequence from a fixed
+      seed instead of storing an expected[] vector: peak memory halved
+    - Test 4 invert pass uses read-modify-write from the tail (memtest86
+      moving-inversions semantics), so fill-phase corruption is detected
+    - Test 9 bit fade: real configurable idle delay (--fade-delay, default
+      1000 ms) between write and verify
+    - Buffer allocation: best-effort mlock + MADV_HUGEPAGE (never fatal)
+    - New --self-test mode: injects a known single-bit fault and verifies
+      the detection logic reports it; also checks a clean buffer yields no
+      false positives
+    - Test 6 (32-bit blocks) now uses the same checkDWord helper as the
+      other tests for consistent error recording
+    - translationDir() prefers a tree-local translations/ dir so rebuilt
+      .qm files win over an older installed copy (dev workflow)
+    - i18n: new help/self-test strings translated (zh_CN)
+
+ -- lichenggang <lichenggang@uniontech.com>  Mon, 18 Aug 2025 13:30:00 +0800
+
 memtest86 (1.0.0-1) unstable; urgency=medium
 
   * Initial release for deepin 25.
@@ -6,5 +27,6 @@ memtest86 (1.0.0-1) unstable; urgency=medium
       block move, random sequence, bit fade)
     - CLI mode and DTK6 GUI mode
     - i18n following system locale (Chinese / English)
+    - App icon, desktop entry, man page, debian packaging
 
  -- lichenggang <lichenggang@uniontech.com>  Sun, 17 Aug 2025 20:50:00 +0800

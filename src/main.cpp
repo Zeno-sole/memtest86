@@ -26,12 +26,14 @@ DWIDGET_USE_NAMESPACE
 
 static QString translationDir()
 {
-    // 1. Installed location
+    // 1. Source/build tree (development) — prefer a tree-local translations/
+    //    dir when present so rebuilt .qm files are picked up before any
+    //    installed copy (which may be older).
     QStringList candidates;
+    candidates << QStringLiteral("translations");
+    // 2. Installed locations
     candidates << QStringLiteral("/usr/share/memtest86/translations")
                << QStringLiteral("/usr/local/share/memtest86/translations");
-    // 2. Build-tree / source-tree locations (development)
-    candidates << QStringLiteral("translations");
     for (const QString &dir : candidates) {
         if (QDir(dir).exists())
             return dir;
@@ -79,7 +81,7 @@ int main(int argc, char *argv[])
     if (cliMode) {
         QCoreApplication app(argc, argv);
         QCoreApplication::setApplicationName(QStringLiteral("memtest86"));
-        QCoreApplication::setApplicationVersion(QStringLiteral("1.0.0"));
+        QCoreApplication::setApplicationVersion(QStringLiteral("1.1.0"));
 
         QTranslator qt, appTr;
         loadTranslator(&qt, &appTr, QLocale::system());
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
         DApplication app(argc, argv);
         DApplication::setApplicationName(QStringLiteral("memtest86"));
         DApplication::setApplicationDisplayName(QObject::tr("Memory Test"));
-        DApplication::setApplicationVersion(QStringLiteral("1.0.0"));
+        DApplication::setApplicationVersion(QStringLiteral("1.1.0"));
         DApplication::setOrganizationName(QStringLiteral("deepin"));
         DApplication::setOrganizationDomain(QStringLiteral("deepin.org"));
         app.setProductName(QObject::tr("Memory Test"));
