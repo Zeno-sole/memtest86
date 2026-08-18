@@ -1,0 +1,71 @@
+.TH MEMTEST86 1 "August 2025" "memtest86 1.0.0" "User Commands"
+.SH NAME
+memtest86 \- memory diagnostic tool for deepin 25
+.SH SYNOPSIS
+.B memtest86
+[\fIoptions\fR]
+.SH DESCRIPTION
+.B memtest86
+is a memory testing utility inspired by memtest86, designed for deepin 25
+systems. It runs various memory test algorithms to detect memory errors.
+By default it starts the graphical (DTK6) interface; use
+.B \-\-cli
+for the command line mode.
+.SH OPTIONS
+.TP
+.B \-\-cli
+Run in command line mode (default is GUI).
+.TP
+.B \-s, \-\-size \fIsize\fR
+Memory size to test, e.g. 256M, 1G, 512K (default: half of available memory).
+.TP
+.B \-p, \-\-passes \fIn\fR
+Number of test passes (default: 1).
+.TP
+.B \-t, \-\-tests \fIlist\fR
+Comma separated test ids, e.g. 0,2,4 (default: all).
+.TP
+.B \-v, \-\-verbose
+Verbose output.
+.TP
+.B \-h, \-\-help
+Show help.
+.SH TESTS
+.TP
+.B 0
+Address test, walking ones
+.TP
+.B 1
+Address test, own address
+.TP
+.B 2
+Moving inversions, ones & zeros
+.TP
+.B 3
+Moving inversions, 8-bit pattern
+.TP
+.B 4
+Moving inversions, random pattern
+.TP
+.B 5
+Block move, 64-bit moves
+.TP
+.B 6
+Moving inversions, 32-bit blocks
+.TP
+.B 7
+Random number sequence
+.TP
+.B 9
+Bit fade test, 2 patterns
+.SH EXIT STATUS
+.B 0
+if the test passed (no memory errors detected),
+.B 1
+if errors were detected or the test failed to run,
+.B 2
+on invalid command line arguments.
+.SH SEE ALSO
+.BR memtest86 (8)
+.SH AUTHOR
+lichenggang <lichenggang@uniontech.com>

@@ -54,3 +54,10 @@ dkms.conf
 # Compiled translations
 *.qm
 build/
+obj-x86_64-linux-gnu/
+debian/memtest86/
+debian/.debhelper/
+debian/files
+debian/debhelper-build-stamp
+debian/*.debhelper.log
+debian/*.substvars

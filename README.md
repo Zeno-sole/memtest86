@@ -75,6 +75,33 @@ cmake --install build --prefix /usr
 
 会安装可执行文件、翻译文件（/usr/share/memtest86/translations）和桌面入口。
 
+## 构建 deb 包 / Build deb package
+
+项目根目录已包含 `debian/` 打包目录（基于 debhelper 13 + CMake），可直接构建：
+
+```bash
+# 安装构建依赖
+sudo apt build-dep .
+
+# 构建二进制 deb 包（不签名）
+dpkg-buildpackage -b -us -uc
+```
+
+产物在上级目录：`memtest86_1.0.0-1_amd64.deb`（含 dbgsym 调试包）。
+
+包内容：
+- `/usr/bin/memtest86` — 可执行程序
+- `/usr/share/applications/memtest86.desktop` — 桌面入口
+- `/usr/share/man/man1/memtest86.1.gz` — 手册页
+- `/usr/share/memtest86/translations/` — 中英文翻译
+- `/usr/share/doc/memtest86/` — 版权与变更日志
+
+安装验证：
+
+```bash
+sudo dpkg -i ../memtest86_1.0.0-1_amd64.deb
+```
+
 ## 截图 / Screenshots
 
 中文界面：

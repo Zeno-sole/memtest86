@@ -1,0 +1,32 @@
+Source: memtest86
+Section: utils
+Priority: optional
+Maintainer: lichenggang <lichenggang@uniontech.com>
+Build-Depends: debhelper-compat (= 13),
+               cmake,
+               pkg-config,
+               qt6-base-dev,
+               qt6-tools-dev,
+               qt6-l10n-tools,
+               libdtk6widget-dev
+Standards-Version: 4.6.2
+Homepage: https://github.com/Zeno-sole/memtest86
+Vcs-Browser: https://github.com/Zeno-sole/memtest86
+Vcs-Git: https://github.com/Zeno-sole/memtest86.git
+Rules-Requires-Root: no
+
+Package: memtest86
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Description: Memory diagnostic tool for deepin 25
+ A memory testing utility inspired by memtest86, designed for deepin 25
+ systems. It performs various memory test algorithms (walking ones,
+ moving inversions, block moves, random sequences, bit fade) to detect
+ memory errors.
+ .
+ Features:
+  * 9 memory test algorithms modeled on memtest86
+  * Command line interface (CLI) mode
+  * DTK6 graphical interface with live progress and error table
+  * i18n: follows the system language (Chinese / English)

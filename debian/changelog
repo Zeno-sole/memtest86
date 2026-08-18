@@ -1,0 +1,10 @@
+memtest86 (1.0.0-1) unstable; urgency=medium
+
+  * Initial release for deepin 25.
+  * Memory diagnostic tool inspired by memtest86:
+    - 9 test algorithms (walking ones, own address, moving inversions,
+      block move, random sequence, bit fade)
+    - CLI mode and DTK6 GUI mode
+    - i18n following system locale (Chinese / English)
+
+ -- lichenggang <lichenggang@uniontech.com>  Sun, 17 Aug 2025 20:50:00 +0800

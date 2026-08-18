@@ -273,7 +273,6 @@ void MemTesterCore::run()
     for (quint64 i = 0; i < words; i += 4096 / kWordSize)
         base[i] = 0;
 
-    bool ok = true;
     int pass = 0;
     while (pass < m_passes && !m_stopRequested.load()) {
         for (int testId : tests) {
@@ -287,25 +286,22 @@ void MemTesterCore::run()
             log(QString("Pass %1/%2  test %3 started")
                     .arg(pass + 1).arg(m_passes).arg(testName(testId)));
 
-            bool testOk = true;
             switch (testId) {
-            case TestAddressWalkingOnes: testOk = testAddressWalkingOnes(regionSize); break;
-            case TestAddressOwnAddress:  testOk = testAddressOwnAddress(regionSize); break;
-            case TestMovingInv01:        testOk = testMovingInversions01(regionSize); break;
-            case TestMovingInv8bit:      testOk = testMovingInversions8bit(regionSize); break;
-            case TestMovingInvRandom:    testOk = testMovingInversionsRandom(regionSize); break;
-            case TestBlockMove64:        testOk = testBlockMove64(regionSize); break;
-            case TestMovingInv32block:   testOk = testMovingInversions32block(regionSize); break;
-            case TestRandomSequence:     testOk = testRandomSequence(regionSize); break;
-            case TestBitFade:            testOk = testBitFade(regionSize); break;
+            case TestAddressWalkingOnes: testAddressWalkingOnes(regionSize); break;
+            case TestAddressOwnAddress:  testAddressOwnAddress(regionSize); break;
+            case TestMovingInv01:        testMovingInversions01(regionSize); break;
+            case TestMovingInv8bit:      testMovingInversions8bit(regionSize); break;
+            case TestMovingInvRandom:    testMovingInversionsRandom(regionSize); break;
+            case TestBlockMove64:        testBlockMove64(regionSize); break;
+            case TestMovingInv32block:   testMovingInversions32block(regionSize); break;
+            case TestRandomSequence:     testRandomSequence(regionSize); break;
+            case TestBitFade:            testBitFade(regionSize); break;
             default: break;
             }
 
             m_currentPassBytes = regionSize;
             reportProgress(ProgressInfo{testId, pass, m_passes, regionSize, regionSize,
                                         errorCount(), computePercent(pass, tests.indexOf(testId), tests.size())});
-            if (!testOk)
-                ok = false;
             if (m_stopRequested.load())
                 break;
         }

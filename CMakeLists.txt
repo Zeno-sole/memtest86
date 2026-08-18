@@ -65,3 +65,7 @@ configure_file(
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/memtest86.desktop
     DESTINATION share/applications)
+
+# Man page
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/memtest86.1
+    DESTINATION share/man/man1)
