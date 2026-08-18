@@ -22,6 +22,9 @@ namespace memtest {
 namespace {
 constexpr quint64 kWordSize = sizeof(uint64_t);
 constexpr quint64 kPassesPerTest = 1; // granularity not used; pass count is outer
+// Long sweeps check the stop flag every this many words so that a Stop
+// request is honored within milliseconds even on multi-GiB buffers.
+constexpr quint64 kStopCheckStride = 1ULL << 18; // 256K words = 2 MiB
 }
 
 MemTesterCore::MemTesterCore(QObject *parent)
@@ -382,13 +385,13 @@ void MemTesterCore::run()
             }
 
             m_currentPassBytes = regionSize;
+            m_testedBytes += regionSize;
             reportProgress(ProgressInfo{testId, pass, m_passes, regionSize, regionSize,
                                         errorCount(), computePercent(pass, tests.indexOf(testId), tests.size())});
             if (m_stopRequested.load())
                 break;
         }
         ++pass;
-        m_testedBytes += regionSize;
     }
     m_cancel.store(m_stopRequested.load());
 }
@@ -421,6 +424,8 @@ bool MemTesterCore::testAddressWalkingOnes(quint64 bytes)
     for (int bit = 0; bit < 64 && !m_stopRequested.load(); ++bit) {
         for (quint64 i = 0; i < words; ++i) {
             mem[i] = pattern;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = i * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -450,6 +455,8 @@ bool MemTesterCore::testAddressOwnAddress(quint64 bytes)
 
     for (quint64 i = 0; i < words; ++i) {
         mem[i] = i;
+        if (m_stopRequested.load()) break;
+        if (m_stopRequested.load()) break;
         if ((i & 0x7FFFF) == 0) {
             m_currentPassBytes = i * kWordSize;
             reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -460,6 +467,8 @@ bool MemTesterCore::testAddressOwnAddress(quint64 bytes)
     for (quint64 i = 0; i < words; ++i) {
         if (!checkWord(&mem[i], i, TestAddressOwnAddress, QStringLiteral("own address")))
             break;
+        if (m_stopRequested.load()) break;
+        if (m_stopRequested.load()) break;
         if ((i & 0x7FFFF) == 0) {
             m_currentPassBytes = (words + i) * kWordSize;
             reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -468,8 +477,10 @@ bool MemTesterCore::testAddressOwnAddress(quint64 bytes)
         }
     }
     // inverted pass
-    for (quint64 i = 0; i < words; ++i)
+    for (quint64 i = 0; i < words; ++i) {
+        if (m_stopRequested.load()) break;
         mem[i] = ~i;
+    }
     for (quint64 i = 0; i < words; ++i) {
         if (!checkWord(&mem[i], ~i, TestAddressOwnAddress, QStringLiteral("own address inverted")))
             break;
@@ -491,6 +502,8 @@ bool MemTesterCore::testMovingInversions01(quint64 bytes)
         const uint64_t inv = (phase == 0) ? p2 : p1;
         for (quint64 i = 0; i < words; ++i) {
             mem[i] = pat;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = i * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -499,11 +512,14 @@ bool MemTesterCore::testMovingInversions01(quint64 bytes)
             }
         }
         for (quint64 i = words; i-- > 0;) {
+            if (m_stopRequested.load()) break;
             mem[i] = inv;
         }
         for (quint64 i = 0; i < words; ++i) {
             if (!checkWord(&mem[i], inv, TestMovingInv01, QStringLiteral("inv 01")))
                 break;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = (words + i) * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -526,6 +542,8 @@ bool MemTesterCore::testMovingInversions8bit(quint64 bytes)
     for (int rep = 0; rep < 2 && !m_stopRequested.load(); ++rep) {
         for (quint64 i = 0; i < words; ++i) {
             mem[i] = pattern;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = i * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -534,11 +552,14 @@ bool MemTesterCore::testMovingInversions8bit(quint64 bytes)
             }
         }
         for (quint64 i = words; i-- > 0;) {
+            if (m_stopRequested.load()) break;
             mem[i] = anti;
         }
         for (quint64 i = 0; i < words; ++i) {
             if (!checkWord(&mem[i], anti, TestMovingInv8bit, QStringLiteral("inv 8bit")))
                 break;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = (words + i) * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -567,6 +588,8 @@ bool MemTesterCore::testMovingInversionsRandom(quint64 bytes)
             std::mt19937_64 rng(kSeed);
             for (quint64 i = 0; i < words; ++i) {
                 mem[i] = rng();
+                if (m_stopRequested.load()) break;
+                if (m_stopRequested.load()) break;
                 if ((i & 0x7FFFF) == 0) {
                     m_currentPassBytes = i * kWordSize;
                     reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -580,6 +603,8 @@ bool MemTesterCore::testMovingInversionsRandom(quint64 bytes)
         // (moving inversions coupling stress).
         for (quint64 i = words; i-- > 0;) {
             mem[i] = ~mem[i];
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x7FFFF) == 0) {
                 m_currentPassBytes = (words + i) * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -612,13 +637,17 @@ bool MemTesterCore::testBlockMove64(quint64 bytes)
     const uint64_t pattern = 0xDEADBEEFCAFEBABEULL;
 
     // init first half with pattern
-    for (quint64 i = 0; i < half; ++i)
+    for (quint64 i = 0; i < half; ++i) {
+        if (m_stopRequested.load()) break;
         mem[i] = pattern;
+    }
 
     // block copy: move second half from first half (memmove semantics)
     // We copy forward in chunks; source/dest don't overlap so a plain copy is fine.
     for (quint64 i = 0; i < half; ++i) {
         mem[half + i] = mem[i];
+        if (m_stopRequested.load()) break;
+        if (m_stopRequested.load()) break;
         if ((i & 0x3FFFF) == 0) {
             m_currentPassBytes = i * kWordSize;
             reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -630,6 +659,8 @@ bool MemTesterCore::testBlockMove64(quint64 bytes)
     for (quint64 i = 0; i < words; ++i) {
         if (!checkWord(&mem[i], pattern, TestBlockMove64, QStringLiteral("block move")))
             break;
+        if (m_stopRequested.load()) break;
+        if (m_stopRequested.load()) break;
         if ((i & 0x3FFFF) == 0) {
             m_currentPassBytes = (half + i) * kWordSize;
             reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -653,6 +684,8 @@ bool MemTesterCore::testMovingInversions32block(quint64 bytes)
         const uint32_t inv = (phase == 0) ? p2 : p1;
         for (quint64 i = 0; i < dwords; ++i) {
             mem[i] = pat;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0xFFFFF) == 0) {
                 m_currentPassBytes = i * sizeof(uint32_t);
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -660,12 +693,16 @@ bool MemTesterCore::testMovingInversions32block(quint64 bytes)
                                 computePercent(m_currentPass, phase * 2, 4)});
             }
         }
-        for (quint64 i = dwords; i-- > 0;)
+        for (quint64 i = dwords; i-- > 0;) {
+            if (m_stopRequested.load()) break;
             mem[i] = inv;
+        }
         for (quint64 i = 0; i < dwords; ++i) {
             if (!checkDWord(&mem[i], inv, TestMovingInv32block,
                             QStringLiteral("inv 32block")))
                 break;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0xFFFFF) == 0) {
                 m_currentPassBytes = (dwords + i) * sizeof(uint32_t);
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -695,6 +732,8 @@ bool MemTesterCore::testRandomSequence(quint64 bytes)
             state ^= state >> 7;
             state ^= state << 17;
             mem[i] = state;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x3FFFF) == 0) {
                 m_currentPassBytes = i * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -713,6 +752,8 @@ bool MemTesterCore::testRandomSequence(quint64 bytes)
             if (!checkWord(&mem[i], state, TestRandomSequence,
                            QStringLiteral("random sequence")))
                 break;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x3FFFF) == 0) {
                 m_currentPassBytes = (words + i) * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,
@@ -734,8 +775,10 @@ bool MemTesterCore::testBitFade(quint64 bytes)
 
     for (int p = 0; p < 2 && !m_stopRequested.load(); ++p) {
         const uint64_t pat = pats[p];
-        for (quint64 i = 0; i < words; ++i)
+        for (quint64 i = 0; i < words; ++i) {
+            if (m_stopRequested.load()) break;
             mem[i] = pat;
+        }
         // Real delay to let charge leak out of weak DRAM cells (respects
         // stop requests so the test remains responsive).
         {
@@ -749,6 +792,8 @@ bool MemTesterCore::testBitFade(quint64 bytes)
         for (quint64 i = 0; i < words; ++i) {
             if (!checkWord(&mem[i], pat, TestBitFade, QStringLiteral("bit fade")))
                 break;
+            if (m_stopRequested.load()) break;
+            if (m_stopRequested.load()) break;
             if ((i & 0x3FFFF) == 0) {
                 m_currentPassBytes = i * kWordSize;
                 reportProgress({m_currentTest, m_currentPass, m_passes,

@@ -96,14 +96,14 @@ reported no errors (detection logic works).
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="97"/>
+        <location filename="../src/main.cpp" line="99"/>
         <source>Error: %1
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="104"/>
-        <location filename="../src/main.cpp" line="108"/>
+        <location filename="../src/main.cpp" line="106"/>
+        <location filename="../src/main.cpp" line="110"/>
         <source>Memory Test</source>
         <translation type="unfinished"></translation>
     </message>
@@ -111,67 +111,67 @@ reported no errors (detection logic works).
 <context>
     <name>memtest</name>
     <message>
-        <location filename="../src/core/memtester.cpp" line="154"/>
+        <location filename="../src/core/memtester.cpp" line="157"/>
         <source>failed to allocate scratch buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="165"/>
+        <location filename="../src/core/memtester.cpp" line="168"/>
         <source>baseline read-back check failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="176"/>
+        <location filename="../src/core/memtester.cpp" line="179"/>
         <source>fault injection was not detected (caught=%1, errors=%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="190"/>
+        <location filename="../src/core/memtester.cpp" line="193"/>
         <source>test algorithm reported %1 errors on a clean buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="268"/>
+        <location filename="../src/core/memtester.cpp" line="271"/>
         <source>Address test, walking ones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="272"/>
+        <location filename="../src/core/memtester.cpp" line="275"/>
         <source>Address test, own address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="276"/>
+        <location filename="../src/core/memtester.cpp" line="279"/>
         <source>Moving inversions, ones &amp; zeros</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="280"/>
+        <location filename="../src/core/memtester.cpp" line="283"/>
         <source>Moving inversions, 8-bit pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="284"/>
+        <location filename="../src/core/memtester.cpp" line="287"/>
         <source>Moving inversions, random pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="288"/>
+        <location filename="../src/core/memtester.cpp" line="291"/>
         <source>Block move, 64-bit moves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="292"/>
+        <location filename="../src/core/memtester.cpp" line="295"/>
         <source>Moving inversions, 32-bit blocks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="296"/>
+        <location filename="../src/core/memtester.cpp" line="299"/>
         <source>Random number sequence</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="300"/>
+        <location filename="../src/core/memtester.cpp" line="303"/>
         <source>Bit fade test, 2 patterns</source>
         <translation type="unfinished"></translation>
     </message>
@@ -179,124 +179,148 @@ reported no errors (detection logic works).
 <context>
     <name>memtest::MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="47"/>
-        <location filename="../src/gui/mainwindow.cpp" line="82"/>
+        <location filename="../src/gui/mainwindow.cpp" line="49"/>
+        <location filename="../src/gui/mainwindow.cpp" line="96"/>
         <source>Memory Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="91"/>
+        <location filename="../src/gui/mainwindow.cpp" line="66"/>
+        <source>System: %1 total, %2 available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="106"/>
         <source>Test Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="96"/>
+        <location filename="../src/gui/mainwindow.cpp" line="111"/>
         <source>Memory size:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="98"/>
+        <location filename="../src/gui/mainwindow.cpp" line="113"/>
         <source>Half of available memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="99"/>
+        <location filename="../src/gui/mainwindow.cpp" line="114"/>
         <source>All available memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="108"/>
+        <location filename="../src/gui/mainwindow.cpp" line="123"/>
         <source>Passes:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="115"/>
+        <location filename="../src/gui/mainwindow.cpp" line="135"/>
         <source>Tests:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="131"/>
-        <location filename="../src/gui/mainwindow.cpp" line="202"/>
+        <location filename="../src/gui/mainwindow.cpp" line="147"/>
+        <source>Select all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="148"/>
+        <source>Clear all</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="168"/>
         <source>Start Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="141"/>
+        <location filename="../src/gui/mainwindow.cpp" line="184"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="145"/>
+        <location filename="../src/gui/mainwindow.cpp" line="188"/>
         <source>Ready</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="162"/>
+        <location filename="../src/gui/mainwindow.cpp" line="205"/>
         <source>Errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Expected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Actual</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="202"/>
+        <location filename="../src/gui/mainwindow.cpp" line="172"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="210"/>
+        <location filename="../src/gui/mainwindow.cpp" line="260"/>
         <source>Stopping...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="222"/>
+        <location filename="../src/gui/mainwindow.cpp" line="272"/>
         <source>Please select at least one test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="228"/>
+        <location filename="../src/gui/mainwindow.cpp" line="278"/>
         <source>Failed to allocate %1 of memory.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="235"/>
+        <location filename="../src/gui/mainwindow.cpp" line="285"/>
         <source>Testing %1 ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="247"/>
+        <location filename="../src/gui/mainwindow.cpp" line="297"/>
         <source>Pass %1/%2 - %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="256"/>
+        <location filename="../src/gui/mainwindow.cpp" line="306"/>
         <source>Tested %1 / %2, %3 errors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="283"/>
+        <location filename="../src/gui/mainwindow.cpp" line="334"/>
+        <source>Stopped - %1 tested in %2 s, %3 errors so far.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="338"/>
+        <source>Stopped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="340"/>
         <source>PASS - %1 tested in %2 s, no errors found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="287"/>
+        <location filename="../src/gui/mainwindow.cpp" line="344"/>
         <source>FAIL - %1 errors detected.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -52,6 +52,16 @@ target_include_directories(memtest86 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
+# Development-only core test: verifies stop responsiveness and that
+# finished() reports non-zero tested bytes when stopped mid-run.
+add_executable(stop_test
+    tests/stop_test.cpp
+    src/core/memtester.cpp
+    src/core/memtester.h
+)
+target_link_libraries(stop_test PRIVATE Qt6::Core)
+target_include_directories(stop_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 # Install: binary + translations
 install(TARGETS memtest86 RUNTIME DESTINATION bin)
 

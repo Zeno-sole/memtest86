@@ -21,6 +21,7 @@ class QComboBox;
 class QTableWidget;
 class QGroupBox;
 class QCheckBox;
+class QLinkButton;
 
 namespace memtest {
 
@@ -44,6 +45,7 @@ private:
     void buildUi();
     void setupConnections();
     void updateState(bool running);
+    void refreshMemInfo();
     quint64 selectedSizeBytes() const;
 
     MemTesterCore *m_tester = nullptr;
@@ -53,6 +55,9 @@ private:
     QSpinBox *m_passSpin = nullptr;
     QCheckBox *m_testChecks[9] = {nullptr};
     QPushButton *m_startButton = nullptr;
+    QPushButton *m_stopButton = nullptr;
+    QLabel *m_memInfoLabel = nullptr;
+    QList<QWidget *> m_selButtons;   // select-all / clear-all (disabled while running)
 
     // Status widgets
     QLabel *m_statusLabel = nullptr;

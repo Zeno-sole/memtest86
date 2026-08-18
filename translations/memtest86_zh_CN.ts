@@ -82,7 +82,7 @@ Tests:
   7  Random number sequence
   9  Bit fade test, 2 patterns
 </source>
-        <translation >用法：memtest86 [选项]
+        <translation>用法：memtest86 [选项]
 
 用于 deepin 25 的内存诊断工具（灵感来自 memtest86）。
 
@@ -114,7 +114,7 @@ Tests:
         <location filename="../src/cli/cli.cpp" line="124"/>
         <source>Self-test: injecting a known fault into a 16 KiB scratch buffer...
 </source>
-        <translation >自检：正在向 16 KiB 临时缓冲区注入已知故障...
+        <translation>自检：正在向 16 KiB 临时缓冲区注入已知故障...
 </translation>
     </message>
     <message>
@@ -122,7 +122,7 @@ Tests:
         <source>Self-test PASSED: fault injection was detected and a clean buffer
 reported no errors (detection logic works).
 </source>
-        <translation >自检通过：故障注入已被检测到，且干净缓冲区未报告错误
+        <translation>自检通过：故障注入已被检测到，且干净缓冲区未报告错误
 （检测逻辑工作正常）。
 </translation>
     </message>
@@ -130,7 +130,7 @@ reported no errors (detection logic works).
         <location filename="../src/cli/cli.cpp" line="133"/>
         <source>Self-test FAILED: %1
 </source>
-        <translation >自检失败：%1
+        <translation>自检失败：%1
 </translation>
     </message>
     <message>
@@ -181,14 +181,14 @@ reported no errors (detection logic works).
 </translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="97"/>
+        <location filename="../src/main.cpp" line="99"/>
         <source>Error: %1
 </source>
         <translation>错误：%1</translation>
     </message>
     <message>
-        <location filename="../src/main.cpp" line="104"/>
-        <location filename="../src/main.cpp" line="108"/>
+        <location filename="../src/main.cpp" line="106"/>
+        <location filename="../src/main.cpp" line="110"/>
         <source>Memory Test</source>
         <translation>内存测试</translation>
     </message>
@@ -196,67 +196,67 @@ reported no errors (detection logic works).
 <context>
     <name>memtest</name>
     <message>
-        <location filename="../src/core/memtester.cpp" line="154"/>
+        <location filename="../src/core/memtester.cpp" line="157"/>
         <source>failed to allocate scratch buffer</source>
-        <translation >无法分配临时缓冲区</translation>
+        <translation>无法分配临时缓冲区</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="165"/>
+        <location filename="../src/core/memtester.cpp" line="168"/>
         <source>baseline read-back check failed</source>
-        <translation >基线回读校验失败</translation>
+        <translation>基线回读校验失败</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="176"/>
+        <location filename="../src/core/memtester.cpp" line="179"/>
         <source>fault injection was not detected (caught=%1, errors=%2)</source>
-        <translation >故障注入未被检测到（捕获=%1，错误数=%2）</translation>
+        <translation>故障注入未被检测到（捕获=%1，错误数=%2）</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="190"/>
+        <location filename="../src/core/memtester.cpp" line="193"/>
         <source>test algorithm reported %1 errors on a clean buffer</source>
-        <translation >测试算法在干净缓冲区上报告了 %1 个错误</translation>
+        <translation>测试算法在干净缓冲区上报告了 %1 个错误</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="268"/>
+        <location filename="../src/core/memtester.cpp" line="271"/>
         <source>Address test, walking ones</source>
         <translation>地址测试，走查 1 位</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="272"/>
+        <location filename="../src/core/memtester.cpp" line="275"/>
         <source>Address test, own address</source>
         <translation>地址测试，自身地址</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="276"/>
+        <location filename="../src/core/memtester.cpp" line="279"/>
         <source>Moving inversions, ones &amp; zeros</source>
         <translation>移动反转，全 1 与全 0</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="280"/>
+        <location filename="../src/core/memtester.cpp" line="283"/>
         <source>Moving inversions, 8-bit pattern</source>
         <translation>移动反转，8 位模式</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="284"/>
+        <location filename="../src/core/memtester.cpp" line="287"/>
         <source>Moving inversions, random pattern</source>
         <translation>移动反转，随机模式</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="288"/>
+        <location filename="../src/core/memtester.cpp" line="291"/>
         <source>Block move, 64-bit moves</source>
         <translation>块移动，64 位移动</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="292"/>
+        <location filename="../src/core/memtester.cpp" line="295"/>
         <source>Moving inversions, 32-bit blocks</source>
         <translation>移动反转，32 位块</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="296"/>
+        <location filename="../src/core/memtester.cpp" line="299"/>
         <source>Random number sequence</source>
         <translation>随机数序列</translation>
     </message>
     <message>
-        <location filename="../src/core/memtester.cpp" line="300"/>
+        <location filename="../src/core/memtester.cpp" line="303"/>
         <source>Bit fade test, 2 patterns</source>
         <translation>位衰减测试，2 种模式</translation>
     </message>
@@ -264,124 +264,148 @@ reported no errors (detection logic works).
 <context>
     <name>memtest::MainWindow</name>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="47"/>
-        <location filename="../src/gui/mainwindow.cpp" line="82"/>
+        <location filename="../src/gui/mainwindow.cpp" line="49"/>
+        <location filename="../src/gui/mainwindow.cpp" line="96"/>
         <source>Memory Test</source>
         <translation>内存测试</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="91"/>
+        <location filename="../src/gui/mainwindow.cpp" line="66"/>
+        <source>System: %1 total, %2 available</source>
+        <translation>系统：共 %1，可用 %2</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="106"/>
         <source>Test Configuration</source>
         <translation>测试配置</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="96"/>
+        <location filename="../src/gui/mainwindow.cpp" line="111"/>
         <source>Memory size:</source>
         <translation>内存大小：</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="98"/>
+        <location filename="../src/gui/mainwindow.cpp" line="113"/>
         <source>Half of available memory</source>
         <translation>可用内存的一半</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="99"/>
+        <location filename="../src/gui/mainwindow.cpp" line="114"/>
         <source>All available memory</source>
         <translation>全部可用内存</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="108"/>
+        <location filename="../src/gui/mainwindow.cpp" line="123"/>
         <source>Passes:</source>
         <translation>测试轮数：</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="115"/>
+        <location filename="../src/gui/mainwindow.cpp" line="135"/>
         <source>Tests:</source>
         <translation>测试项目：</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="131"/>
-        <location filename="../src/gui/mainwindow.cpp" line="202"/>
+        <location filename="../src/gui/mainwindow.cpp" line="147"/>
+        <source>Select all</source>
+        <translation>全选</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="148"/>
+        <source>Clear all</source>
+        <translation>全不选</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="168"/>
         <source>Start Test</source>
         <translation>开始测试</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="141"/>
+        <location filename="../src/gui/mainwindow.cpp" line="184"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="145"/>
+        <location filename="../src/gui/mainwindow.cpp" line="188"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="162"/>
+        <location filename="../src/gui/mainwindow.cpp" line="205"/>
         <source>Errors</source>
         <translation>错误记录</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Address</source>
         <translation>地址</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Expected</source>
         <translation>期望值</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Actual</source>
         <translation>实际值</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="167"/>
+        <location filename="../src/gui/mainwindow.cpp" line="210"/>
         <source>Test</source>
         <translation>测试</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="202"/>
+        <location filename="../src/gui/mainwindow.cpp" line="172"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="210"/>
+        <location filename="../src/gui/mainwindow.cpp" line="260"/>
         <source>Stopping...</source>
         <translation>正在停止…</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="222"/>
+        <location filename="../src/gui/mainwindow.cpp" line="272"/>
         <source>Please select at least one test.</source>
         <translation>请至少选择一个测试项目。</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="228"/>
+        <location filename="../src/gui/mainwindow.cpp" line="278"/>
         <source>Failed to allocate %1 of memory.</source>
         <translation>无法分配 %1 内存。</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="235"/>
+        <location filename="../src/gui/mainwindow.cpp" line="285"/>
         <source>Testing %1 ...</source>
         <translation>正在测试 %1 …</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="247"/>
+        <location filename="../src/gui/mainwindow.cpp" line="297"/>
         <source>Pass %1/%2 - %3</source>
         <translation>第 %1/%2 轮 - %3</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="256"/>
+        <location filename="../src/gui/mainwindow.cpp" line="306"/>
         <source>Tested %1 / %2, %3 errors</source>
         <translation>已测试 %1 / %2，%3 个错误</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="283"/>
+        <location filename="../src/gui/mainwindow.cpp" line="334"/>
+        <source>Stopped - %1 tested in %2 s, %3 errors so far.</source>
+        <translation>已停止 - 已测试 %1，用时 %2 秒，发现 %3 个错误。</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="338"/>
+        <source>Stopped.</source>
+        <translation>已停止。</translation>
+    </message>
+    <message>
+        <location filename="../src/gui/mainwindow.cpp" line="340"/>
         <source>PASS - %1 tested in %2 s, no errors found.</source>
         <translation>通过 - 测试 %1 用时 %2 秒，未发现错误。</translation>
     </message>
     <message>
-        <location filename="../src/gui/mainwindow.cpp" line="287"/>
+        <location filename="../src/gui/mainwindow.cpp" line="344"/>
         <source>FAIL - %1 errors detected.</source>
         <translation>失败 - 检测到 %1 个错误。</translation>
     </message>

@@ -1,3 +1,21 @@
+memtest86 (1.1.0-2) unstable; urgency=medium
+
+  * GUI polish iteration
+    - Fix title bar icon: use the app's memtest86 icon (was "diagnostics")
+    - Test checkboxes in a 3-column grid + Select-all / Clear-all links;
+      configuration group is compact and no longer squeezes the status area
+    - Show system memory total/available to help pick a test size
+    - Start/Stop dual buttons (DSuggestButton / DWarningButton), swapped by
+      state, with immediate style feedback
+    - Release the test buffer on stop/finish so memory returns to the system
+    - All long test loops now poll the stop flag every 2 MiB: stop responds
+      within milliseconds even on multi-GiB buffers (was seconds)
+    - finished() reports bytes actually tested when stopped mid-run
+      (previously 0 on early stop)
+    - i18n: new GUI strings translated (zh_CN)
+
+ -- lichenggang <lichenggang@uniontech.com>  Tue, 18 Aug 2025 20:20:00 +0800
+
 memtest86 (1.1.0-1) unstable; urgency=medium
 
   * Iteration: core algorithm and robustness improvements

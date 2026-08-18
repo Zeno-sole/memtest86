@@ -21,6 +21,11 @@ Supports both CLI and DTK GUI modes; UI language follows the system locale
   - Test 9: 位衰减测试，2 种模式 / Bit fade test, 2 patterns
 - CLI 模式：指定内存大小、轮数、测试项，输出结果
 - GUI 模式：DTK6 风格界面，实时进度、错误记录表格
+  - 9 个测试项三列排列 + 全选/全不选快捷操作，配置区紧凑
+  - 显示系统内存总量/可用量，帮助选择测试大小
+  - 开始/停止双按钮（DTK Suggest/Warning），运行中一键停止
+  - 停止/完成后立即释放测试缓冲区，内存归还系统
+  - 所有测试内部循环定期检查停止请求，多 GiB 缓冲区下停止响应毫秒级
 - 中英文自动跟随系统语言（Qt Linguist i18n）
 - 自检模式（--self-test）：注入已知故障验证检测逻辑本身
 - 位衰减测试支持真实静置延时（--fade-delay），可配置

@@ -18,6 +18,8 @@
 #include <DTableWidget>
 #include <DTitlebar>
 #include <DSuggestButton>
+#include <DWarningButton>
+#include <DCommandLinkButton>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -52,6 +54,18 @@ MainWindow::MainWindow(QWidget *parent)
     buildUi();
     setupConnections();
     updateState(false);
+    refreshMemInfo();
+}
+
+void MainWindow::refreshMemInfo()
+{
+    if (!m_memInfoLabel)
+        return;
+    const quint64 total = MemTesterCore::totalPhysicalMemory();
+    const quint64 avail = MemTesterCore::availablePhysicalMemory();
+    m_memInfoLabel->setText(tr("System: %1 total, %2 available")
+                                .arg(MemTesterCore::humanSize(total))
+                                .arg(MemTesterCore::humanSize(avail)));
 }
 
 MainWindow::~MainWindow() = default;
@@ -80,7 +94,8 @@ void MainWindow::buildUi()
 {
     DTitlebar *titlebar = this->titlebar();
     titlebar->setTitle(tr("Memory Test"));
-    titlebar->setIcon(QIcon::fromTheme(QStringLiteral("diagnostics")));
+    titlebar->setIcon(QIcon::fromTheme(QStringLiteral("memtest86"),
+                                       QIcon(QStringLiteral(":/icons/memtest86.svg"))));
 
     QWidget *central = new QWidget;
     auto *root = new QVBoxLayout(central);
@@ -111,29 +126,57 @@ void MainWindow::buildUi()
     m_passSpin->setValue(1);
     cfgLayout->addWidget(m_passSpin, 0, 3);
 
-    // Tests
-    cfgLayout->addWidget(new QLabel(tr("Tests:")), 1, 0, Qt::AlignTop);
+    // System memory info (read-only, helps pick a size)
+    m_memInfoLabel = new QLabel;
+    DFontSizeManager::instance()->bind(m_memInfoLabel, DFontSizeManager::T8);
+    cfgLayout->addWidget(m_memInfoLabel, 1, 0, 1, 4);
+
+    // Tests — 3 columns to save vertical space
+    cfgLayout->addWidget(new QLabel(tr("Tests:")), 2, 0, Qt::AlignTop);
     auto *testsWidget = new QWidget;
-    auto *testsLayout = new QVBoxLayout(testsWidget);
+    auto *testsLayout = new QGridLayout(testsWidget);
     testsLayout->setContentsMargins(0, 0, 0, 0);
     testsLayout->setSpacing(4);
     const auto tests = MemTesterCore::allTests();
     for (int i = 0; i < tests.size(); ++i) {
         m_testChecks[i] = new DCheckBox(tests[i].name);
         m_testChecks[i]->setChecked(true);
-        testsLayout->addWidget(m_testChecks[i]);
+        testsLayout->addWidget(m_testChecks[i], i / 3, i % 3);
     }
-    cfgLayout->addWidget(testsWidget, 1, 1, 1, 3);
+    // Select-all / clear-all quick actions
+    auto *selectAll = new DCommandLinkButton(tr("Select all"));
+    auto *clearAll = new DCommandLinkButton(tr("Clear all"));
+    m_selButtons << selectAll << clearAll;
+    auto *selRow = new QHBoxLayout;
+    selRow->addWidget(selectAll);
+    selRow->addWidget(clearAll);
+    selRow->addStretch();
+    testsLayout->addLayout(selRow, (tests.size() + 2) / 3, 0, 1, 3);
+    connect(selectAll, &DCommandLinkButton::clicked, this, [this]() {
+        for (int i = 0; i < 9; ++i)
+            m_testChecks[i]->setChecked(true);
+    });
+    connect(clearAll, &DCommandLinkButton::clicked, this, [this]() {
+        for (int i = 0; i < 9; ++i)
+            m_testChecks[i]->setChecked(false);
+    });
+    cfgLayout->addWidget(testsWidget, 2, 1, 1, 3);
 
     root->addWidget(cfgBox);
 
-    // ---------- Start / stop ----------
+    // ---------- Start / stop (two buttons, swapped by state) ----------
     m_startButton = new DSuggestButton(tr("Start Test"));
     m_startButton->setMinimumHeight(36);
     m_startButton->setMinimumWidth(140);
+    m_stopButton = new DWarningButton;
+    m_stopButton->setText(tr("Stop"));
+    m_stopButton->setMinimumHeight(36);
+    m_stopButton->setMinimumWidth(140);
+    m_stopButton->hide();
     auto *btnRow = new QHBoxLayout;
     btnRow->addStretch();
     btnRow->addWidget(m_startButton);
+    btnRow->addWidget(m_stopButton);
     btnRow->addStretch();
     root->addLayout(btnRow);
 
@@ -166,7 +209,11 @@ void MainWindow::buildUi()
     m_errorTable->setHorizontalHeaderLabels({
         tr("Address"), tr("Expected"), tr("Actual"), tr("Test")
     });
-    m_errorTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    // Address/Expected/Actual are fixed hex widths; Test stretches.
+    m_errorTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    m_errorTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    m_errorTable->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    m_errorTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     m_errorTable->verticalHeader()->setVisible(false);
     m_errorTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_errorTable->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -184,6 +231,7 @@ void MainWindow::buildUi()
 void MainWindow::setupConnections()
 {
     connect(m_startButton, &QPushButton::clicked, this, &MainWindow::onStartStopClicked);
+    connect(m_stopButton, &QPushButton::clicked, this, &MainWindow::onStartStopClicked);
     connect(m_tester, &MemTesterCore::progressChanged, this, &MainWindow::onProgress);
     connect(m_tester, &MemTesterCore::errorDetected, this, &MainWindow::onError);
     connect(m_tester, &MemTesterCore::testStarted, this, &MainWindow::onTestStarted);
@@ -199,8 +247,10 @@ void MainWindow::updateState(bool running)
         if (m_testChecks[i])
             m_testChecks[i]->setEnabled(!running);
     }
-    m_startButton->setText(running ? tr("Stop") : tr("Start Test"));
-    m_startButton->setProperty("_d_btn_type", running ? "warning" : "suggest");
+    for (QWidget *w : m_selButtons)
+        w->setEnabled(!running);
+    m_startButton->setVisible(!running);
+    m_stopButton->setVisible(running);
 }
 
 void MainWindow::onStartStopClicked()
@@ -279,14 +329,25 @@ void MainWindow::onError(const memtest::MemError &err)
 void MainWindow::onFinished(bool ok, int errorCount, quint64 bytesTested, quint64 durationMs)
 {
     updateState(false);
-    if (ok) {
+    if (m_tester->isCancelled()) {
+        // Test was stopped by the user — do not present it as PASS/FAIL.
+        m_resultLabel->setText(tr("Stopped - %1 tested in %2 s, %3 errors so far.")
+                                   .arg(MemTesterCore::humanSize(bytesTested))
+                                   .arg(QString::number(durationMs / 1000.0, 'f', 1))
+                                   .arg(errorCount));
+        m_statusLabel->setText(tr("Stopped."));
+    } else if (ok) {
         m_resultLabel->setText(tr("PASS - %1 tested in %2 s, no errors found.")
                                    .arg(MemTesterCore::humanSize(bytesTested))
                                    .arg(QString::number(durationMs / 1000.0, 'f', 1)));
     } else {
         m_resultLabel->setText(tr("FAIL - %1 errors detected.").arg(errorCount));
     }
-    m_progress->setValue(100);
+    m_progress->setValue(m_tester->isCancelled() ? m_progress->value() : 100);
+
+    // Release the test buffer so memory is returned to the system promptly
+    // after a run (or a user-initiated stop).
+    m_tester->freeBuffer();
 }
 
 } // namespace memtest
