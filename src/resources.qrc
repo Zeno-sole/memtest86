@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="memtest86.svg">../misc/memtest86.svg</file>
+    </qresource>
+</RCC>

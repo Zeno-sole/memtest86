@@ -15,9 +15,14 @@
 #include <QLibraryInfo>
 #include <QDir>
 #include <QDebug>
+#include <QIcon>
+
+#include <DApplication>
 
 #include "cli/cli.h"
 #include "gui/mainwindow.h"
+
+DWIDGET_USE_NAMESPACE
 
 static QString translationDir()
 {
@@ -94,12 +99,15 @@ int main(int argc, char *argv[])
             rc = 2;
         }
     } else {
-        QApplication app(argc, argv);
-        QApplication::setApplicationName(QStringLiteral("memtest86"));
-        QApplication::setApplicationDisplayName(QObject::tr("Memory Test"));
-        QApplication::setApplicationVersion(QStringLiteral("1.0.0"));
-        QApplication::setOrganizationName(QStringLiteral("deepin"));
-        QApplication::setOrganizationDomain(QStringLiteral("deepin.org"));
+        DApplication app(argc, argv);
+        DApplication::setApplicationName(QStringLiteral("memtest86"));
+        DApplication::setApplicationDisplayName(QObject::tr("Memory Test"));
+        DApplication::setApplicationVersion(QStringLiteral("1.0.0"));
+        DApplication::setOrganizationName(QStringLiteral("deepin"));
+        DApplication::setOrganizationDomain(QStringLiteral("deepin.org"));
+        app.setProductName(QObject::tr("Memory Test"));
+        app.setProductIcon(QIcon::fromTheme(QStringLiteral("memtest86"),
+                                             QIcon(QStringLiteral(":/icons/memtest86.svg"))));
 
         QTranslator qt, appTr;
         loadTranslator(&qt, &appTr, QLocale::system());

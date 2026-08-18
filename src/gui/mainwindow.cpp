@@ -34,6 +34,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QFrame>
+#include <QIcon>
 
 DWIDGET_USE_NAMESPACE
 
@@ -44,6 +45,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_tester(new MemTesterCore(this))
 {
     setWindowTitle(tr("Memory Test"));
+    setWindowIcon(QIcon::fromTheme(QStringLiteral("memtest86"),
+                                   QIcon(QStringLiteral(":/icons/memtest86.svg"))));
     resize(860, 620);
 
     buildUi();

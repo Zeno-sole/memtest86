@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2C6BDB"/>
+      <stop offset="100%" stop-color="#1A4FA8"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#D8E4F7"/>
+    </linearGradient>
+    <linearGradient id="pins" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFD24D"/>
+      <stop offset="100%" stop-color="#E8A900"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bg)"/>
+
+  <!-- Memory chip body -->
+  <rect x="34" y="40" width="60" height="48" rx="6" fill="url(#chip)"/>
+
+  <!-- Chip notch / indent -->
+  <rect x="58" y="40" width="12" height="5" rx="2" fill="#B9CCEB"/>
+
+  <!-- Vertical pins (gold) top -->
+  <rect x="42" y="30" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="52" y="30" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="62" y="30" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="72" y="30" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="82" y="30" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+
+  <!-- Vertical pins (gold) bottom -->
+  <rect x="42" y="88" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="52" y="88" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="62" y="88" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="72" y="88" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+  <rect x="82" y="88" width="5" height="10" rx="1.5" fill="url(#pins)"/>
+
+  <!-- Check mark (diagnostic passed) -->
+  <path d="M50 66 L60 76 L80 54" fill="none" stroke="#1A4FA8" stroke-width="7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

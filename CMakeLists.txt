@@ -37,6 +37,7 @@ add_executable(memtest86
     src/cli/cli.h
     src/gui/mainwindow.cpp
     src/gui/mainwindow.h
+    src/resources.qrc
     ${QM_FILES}
 )
 
@@ -57,7 +58,7 @@ install(TARGETS memtest86 RUNTIME DESTINATION bin)
 install(FILES ${QM_FILES}
     DESTINATION share/memtest86/translations)
 
-# Desktop entry & icon (simple)
+# Desktop entry & icon
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/misc/memtest86.desktop.in
     ${CMAKE_CURRENT_BINARY_DIR}/memtest86.desktop
@@ -65,6 +66,18 @@ configure_file(
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/memtest86.desktop
     DESTINATION share/applications)
+
+# App icon (SVG + multi-size PNG, hicolor theme).
+# Each PNG is named memtest86.png inside its size directory; source files in
+# misc/icons/ are bare <size>.png and are installed with the app name.
+install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/memtest86.svg
+    DESTINATION share/icons/hicolor/scalable/apps
+    RENAME memtest86.svg)
+foreach(size 16 24 32 48 64 128 256 512)
+    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/icons/${size}.png
+        DESTINATION share/icons/hicolor/${size}x${size}/apps
+        RENAME memtest86.png)
+endforeach()
 
 # Man page
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/misc/memtest86.1
